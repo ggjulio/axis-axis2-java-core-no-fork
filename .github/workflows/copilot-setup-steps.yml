@@ -12,8 +12,13 @@ jobs:
   copilot-setup-steps:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Install gh-aw extension
+        uses: github/gh-aw/actions/setup-cli@v0.50.5
+        with:
+          version: v0.50.5
 
       - name: Cache Maven Repository
         uses: actions/cache@v5
