@@ -1,0 +1,194 @@
+# Slash-command triggered workflow to request Copilot coding agent
+# to fix build failures on pull requests (e.g. dependency update PRs).
+#
+# Usage: Comment "/ai-upgrade" on any PR with a failed CI run.
+name: AI-Assisted Upgrade
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+
+jobs:
+  ai-upgrade:
+    name: AI-Assisted Upgrade
+    # Only trigger on PR comments (not issue comments) containing /ai-upgrade
+    if: >
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/ai-upgrade')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: React to command
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes',
+            });
+
+      - name: Get PR info and find failed CI run
+        id: pr-info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const prNumber = context.payload.issue.number;
+            core.setOutput('pr-number', String(prNumber));
+
+            // Get PR details (description, head SHA, branch)
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            const prDescription = [
+              `## PR #${prNumber}: ${pr.title}`,
+              '',
+              pr.body || '(no description)',
+            ].join('\n');
+            fs.writeFileSync('pr-description.txt', prDescription);
+            core.info(`PR title: ${pr.title}`);
+            core.setOutput('head-sha', pr.head.sha);
+
+            // Find the most recent failed "Continuous Integration" workflow run for this PR's head SHA
+            const { data: { workflow_runs: runs } } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head_sha: pr.head.sha,
+              status: 'failure',
+              per_page: 10,
+            });
+
+            const ciRun = runs.find(r => r.name === 'Continuous Integration');
+            if (!ciRun) {
+              core.setFailed(`No failed "Continuous Integration" run found for SHA ${pr.head.sha}. Make sure CI has run and failed before using /fix-build.`);
+              return;
+            }
+
+            core.info(`Found failed CI run #${ciRun.id}: ${ciRun.html_url}`);
+            core.setOutput('run-id', String(ciRun.id));
+            core.setOutput('run-url', ciRun.html_url);
+
+      - name: Collect failed job logs
+        id: logs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const runId = parseInt('${{ steps.pr-info.outputs.run-id }}');
+
+            const { data: { jobs } } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId,
+            });
+
+            let failedLogs = '';
+            for (const job of jobs) {
+              if (job.conclusion === 'failure') {
+                try {
+                  const logResponse = await github.rest.actions.downloadJobLogsForWorkflowRun({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    job_id: job.id,
+                  });
+                  failedLogs += `\n===== Job: ${job.name} =====\n${logResponse.data}\n`;
+                } catch (e) {
+                  failedLogs += `\n===== Job: ${job.name} =====\n(Could not retrieve logs: ${e.message})\n`;
+                }
+              }
+            }
+
+            // Truncate to keep within GitHub comment limits (65536 chars max)
+            // Keep the tail since errors are usually at the end
+            const maxLen = 50000;
+            if (failedLogs.length > maxLen) {
+              failedLogs = '... (truncated) ...\n' + failedLogs.substring(failedLogs.length - maxLen);
+            }
+
+            fs.writeFileSync('failed-logs.txt', failedLogs);
+            core.info(`Collected ${failedLogs.length} chars of logs from failed jobs`);
+
+      - name: Post Copilot fix request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const prNumber = parseInt('${{ steps.pr-info.outputs.pr-number }}');
+            const runId = '${{ steps.pr-info.outputs.run-id }}';
+            const runUrl = '${{ steps.pr-info.outputs.run-url }}';
+
+            const logs = fs.readFileSync('failed-logs.txt', 'utf8');
+            const prDescription = fs.readFileSync('pr-description.txt', 'utf8');
+
+            const body = [
+              `@copilot The CI build failed for this dependency update PR. Please analyze the failure and fix the build.`,
+              '',
+              `**Failed workflow run:** [Run #${runId}](${runUrl})`,
+              '',
+              '---',
+              '',
+              '### PR Description (check for breaking changes / migration notes)',
+              '',
+              '<details>',
+              '<summary>Click to expand PR description</summary>',
+              '',
+              prDescription,
+              '',
+              '</details>',
+              '',
+              '---',
+              '',
+              '### Build Failure Logs',
+              '',
+              '<details>',
+              '<summary>Click to expand failed job logs</summary>',
+              '',
+              '```',
+              logs,
+              '```',
+              '',
+              '</details>',
+              '',
+              '---',
+              '',
+              '### Instructions',
+              '',
+              '1. **Analyze the build logs** above to identify the root cause of the failure.',
+              '2. **Review the PR description** for any breaking changes, migration guides, or release notes from the dependency update.',
+              '3. **Fix the code** to make the build pass. This project uses:',
+              '   - **Maven** (`mvn`) as the primary build tool — run `mvn -B -e verify` to validate.',
+              '   - **Java 17** as the base version (also tested on 21 and 25).',
+              '   - **Ant** for some sub-modules (e.g., samples, kernel test resources).',
+              '4. Common fixes for dependency upgrades include:',
+              '   - Updating renamed/moved classes or packages in import statements.',
+              '   - Adjusting API calls for changed method signatures.',
+              '   - Updating configuration files for changed property names.',
+              '   - Fixing version compatibility issues in `pom.xml`.',
+              '5. After making changes, verify the build succeeds with: `mvn -B -e -Papache-release -Dgpg.skip=true verify`',
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: body,
+            });
+
+            // Confirm success with a checkmark reaction
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket',
+            });
+
+            core.info(`Posted Copilot fix request on PR #${prNumber}`);

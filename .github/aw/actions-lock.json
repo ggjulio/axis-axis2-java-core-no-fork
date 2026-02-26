@@ -1,0 +1,29 @@
+{
+  "entries": {
+    "actions/cache@v5": {
+      "repo": "actions/cache",
+      "version": "v5",
+      "sha": "cdf6c1fa76f9f475f3d7449005a359c84ca0f306"
+    },
+    "actions/checkout@v6": {
+      "repo": "actions/checkout",
+      "version": "v6",
+      "sha": "de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+    },
+    "actions/github-script@v8": {
+      "repo": "actions/github-script",
+      "version": "v8",
+      "sha": "ed597411d8f924073f98dfc5c65a23a2325f34cd"
+    },
+    "actions/setup-java@v5": {
+      "repo": "actions/setup-java",
+      "version": "v5",
+      "sha": "be666c2fcd27ec809703dec50e508c2fdc7f6654"
+    },
+    "github/gh-aw/actions/setup@v0.50.5": {
+      "repo": "github/gh-aw/actions/setup",
+      "version": "v0.50.5",
+      "sha": "a7d371cc7e68f270ded0592942424548e05bf1c2"
+    }
+  }
+}
