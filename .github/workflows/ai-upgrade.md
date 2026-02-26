@@ -21,6 +21,7 @@ tools:
 
 jobs:
   setup:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: actions/cache@v5

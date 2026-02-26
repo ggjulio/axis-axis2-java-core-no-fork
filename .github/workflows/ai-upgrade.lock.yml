@@ -22,7 +22,7 @@
 # For more information: https://github.github.com/gh-aw/introduction/overview/
 #
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"f87329c0d6c80914b7297f7460d40308a7e6904dcd6abb81830b10bb668df326","compiler_version":"v0.50.5"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"daa0526bfb55f55f24a1a18b38236ddc3ed8231dfb87e1dcb72edd2b39e12f84","compiler_version":"v0.50.5"}
 
 name: "AI-Assisted Upgrade"
 "on":
@@ -1280,6 +1280,7 @@ jobs:
 
   setup:
     needs: activation
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
