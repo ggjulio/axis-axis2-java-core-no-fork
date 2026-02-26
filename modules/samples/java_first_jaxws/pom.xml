@@ -155,8 +155,8 @@
             <plugin><!-- This allows to run the sample on an embedded servlet container
                      using the following command: mvn cargo:start -->
                 <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <version>1.8.5</version>
+                <artifactId>cargo-maven3-plugin</artifactId>
+                <version>1.9.0</version>
             </plugin>
         </plugins>
     </build>
