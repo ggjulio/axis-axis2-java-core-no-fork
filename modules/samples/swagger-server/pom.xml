@@ -43,7 +43,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <moshi.version>1.15.0</moshi.version>
+        <moshi.version>1.15.2</moshi.version>
         <swagger.version>2.2.18</swagger.version>
     </properties>
 
