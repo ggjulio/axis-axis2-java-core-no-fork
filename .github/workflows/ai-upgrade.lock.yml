@@ -22,7 +22,7 @@
 # For more information: https://github.github.com/gh-aw/introduction/overview/
 #
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"58daf59e882db798047b1ad4ffbbb215152611ca2c894f90325bf9f6e4708568","compiler_version":"v0.50.5"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"7345c1b4030ae975ada565a7a5cba9e785b7d4ae967cb052133739a39ae7d443","compiler_version":"v0.50.5"}
 
 name: "AI-Assisted Upgrade"
 "on":
@@ -1261,7 +1261,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           GH_AW_AGENT_OUTPUT: ${{ env.GH_AW_AGENT_OUTPUT }}
-          GH_AW_SAFE_OUTPUTS_HANDLER_CONFIG: "{\"add_comment\":{\"max\":1},\"missing_data\":{},\"missing_tool\":{},\"push_to_pull_request_branch\":{\"base_branch\":\"${{ github.base_ref || github.ref_name }}\",\"commit_title_suffix\":\" [ai-upgrade]\",\"if_no_changes\":\"error\",\"labels\":[\"ai/generated\",\"ai/claude-opus-4.6\"],\"max_patch_size\":1024,\"target\":\"triggering\"}}"
+          GH_AW_SAFE_OUTPUTS_HANDLER_CONFIG: "{\"add_comment\":{\"max\":1},\"missing_data\":{},\"missing_tool\":{},\"push_to_pull_request_branch\":{\"base_branch\":\"${{ github.base_ref || github.ref_name }}\",\"commit_title_suffix\":\" [ai-upgrade]\",\"if_no_changes\":\"error\",\"max_patch_size\":1024,\"target\":\"triggering\"}}"
           GH_AW_CI_TRIGGER_TOKEN: ${{ secrets.GH_AW_CI_TRIGGER_TOKEN }}
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}

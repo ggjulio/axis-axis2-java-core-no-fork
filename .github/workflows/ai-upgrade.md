@@ -53,7 +53,7 @@ safe-outputs:
   push-to-pull-request-branch:
     target: triggering
     commit-title-suffix: " [ai-upgrade]"
-    labels: [ai/generated, ai/claude-opus-4.6]         # require all labels
+    # labels: [ai/generated]         # require all labels
     if-no-changes: "error"
   add-comment:
 ---
