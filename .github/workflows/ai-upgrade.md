@@ -27,6 +27,11 @@ tools:
   github:
     toolsets: [issues, pull_requests, actions]
 
+network:
+  allowed:
+    - defaults
+    - java
+
 jobs:
   setup:
     runs-on: ubuntu-latest
