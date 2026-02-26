@@ -121,7 +121,7 @@
                                     <artifact>
                                         <groupId>org.apache.felix</groupId>
                                         <artifactId>org.apache.felix.http.jetty</artifactId>
-                                        <version>5.1.26</version>
+                                        <version>5.2.0</version>
                                     </artifact>
                                     <artifact>
                                         <groupId>org.apache.felix</groupId>
