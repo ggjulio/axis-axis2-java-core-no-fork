@@ -19,6 +19,11 @@
 
 package org.apache.axis2.jaxws.type_substitution;
 
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
+
+@XmlType(name = "apple", namespace = "http://apple.org")
+@XmlSeeAlso({Fuji.class, Freyburg.class})
 public abstract class Apple {
 
     protected String color;

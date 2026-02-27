@@ -19,6 +19,9 @@
 
 package org.apache.axis2.jaxws.type_substitution;
 
+import jakarta.xml.bind.annotation.XmlType;
+
+@XmlType(name = "freyburg", namespace = "http://apple.org")
 public class Freyburg extends Apple {
 
     private String season;

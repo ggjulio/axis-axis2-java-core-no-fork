@@ -19,6 +19,9 @@
 
 package org.apache.axis2.jaxws.type_substitution;
 
+import jakarta.xml.bind.annotation.XmlType;
+
+@XmlType(name = "fuji", namespace = "http://apple.org")
 public class Fuji extends Apple {
 
     private String location;
