@@ -31,6 +31,7 @@ network:
   allowed:
     - defaults
     - java
+    - gitbox.apache.org
 
 jobs:
   setup:
