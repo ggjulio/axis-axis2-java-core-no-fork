@@ -32,6 +32,7 @@ network:
     - defaults
     - java
     - gitbox.apache.org
+    - commons.apache.org
 
 jobs:
   setup:
