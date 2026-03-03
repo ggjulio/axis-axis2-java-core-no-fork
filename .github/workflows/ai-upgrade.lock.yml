@@ -22,7 +22,7 @@
 # For more information: https://github.github.com/gh-aw/introduction/overview/
 #
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"8a89eedf6c840fe69291db0f25f1003219429998ceb368ccd86230e2a3da3598","compiler_version":"v0.50.5"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"91d40a495de79beba2aca51944f8981113d686899f96c296b77f2a02d8659835","compiler_version":"v0.50.5"}
 
 name: "AI-Assisted Upgrade"
 "on":
@@ -1296,4 +1296,5 @@ jobs:
           java-version: "17"
       - run: sudo apt-get update && sudo apt-get install -y ant
       - run: mvn -B -q dependency:go-offline -DexcludeReactor=false || true
+      - run: chmod -R a+rwX ~/.m2
 

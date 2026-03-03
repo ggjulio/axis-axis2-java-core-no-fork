@@ -53,6 +53,7 @@ jobs:
           distribution: 'temurin'
       - run: sudo apt-get update && sudo apt-get install -y ant
       - run: mvn -B -q dependency:go-offline -DexcludeReactor=false || true
+      - run: chmod -R a+rwX ~/.m2
 
 env:
   MAVEN_OPTS: -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
@@ -84,7 +85,9 @@ The PR number is: ${{ github.event.issue.number }}
 **IMPORTANT — Firewalled environment with Maven proxy:**
 This agent runs inside a network-firewalled container. All HTTP/HTTPS traffic is routed through a Squid proxy via iptables NAT rules. The entrypoint pre-configures Maven with proxy settings in `~/.m2/settings.xml` and `JAVA_TOOL_OPTIONS`.
 - **DO NOT** create a custom `settings.xml` or override the existing one. It contains the proxy configuration Maven needs to reach Maven Central.
-- **DO NOT** set `-s <custom-settings>` or `-Dmaven.repo.local=<custom-path>` unless absolutely necessary.
+- **NEVER** use `-Dmaven.repo.local=<custom-path>` — this bypasses the proxy-configured `settings.xml` and Maven will fail to download anything.
+- **NEVER** use `-s <custom-settings>` to point to a different settings file.
+- If `~/.m2/repository` has permission issues, fix with `chmod -R u+rwX ~/.m2` — do NOT work around it with `-Dmaven.repo.local`.
 - If Maven fails to resolve dependencies, check that `~/.m2/settings.xml` exists and contains proxy entries — don't replace it with an empty file.
 - Just run Maven commands normally (e.g., `mvn -B compile ...`). The proxy is transparent.
 
