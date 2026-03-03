@@ -33,6 +33,7 @@ network:
     - java
     - gitbox.apache.org
     - commons.apache.org
+    - javadoc.io
 
 jobs:
   setup:
