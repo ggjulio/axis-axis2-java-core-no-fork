@@ -80,6 +80,13 @@ The PR number is: ${{ github.event.issue.number }}
 
 ## Instructions
 
+**IMPORTANT — Firewalled environment with Maven proxy:**
+This agent runs inside a network-firewalled container. All HTTP/HTTPS traffic is routed through a Squid proxy via iptables NAT rules. The entrypoint pre-configures Maven with proxy settings in `~/.m2/settings.xml` and `JAVA_TOOL_OPTIONS`.
+- **DO NOT** create a custom `settings.xml` or override the existing one. It contains the proxy configuration Maven needs to reach Maven Central.
+- **DO NOT** set `-s <custom-settings>` or `-Dmaven.repo.local=<custom-path>` unless absolutely necessary.
+- If Maven fails to resolve dependencies, check that `~/.m2/settings.xml` exists and contains proxy entries — don't replace it with an empty file.
+- Just run Maven commands normally (e.g., `mvn -B compile ...`). The proxy is transparent.
+
 1. **Identify the pull request** from the trigger context.
 2. **Read the PR description** carefully — dependency update PRs (from Dependabot or Renovate) include release notes, changelogs, and breaking change information. This is critical for major version upgrades.
 3. **Find the latest failed CI run** for this PR using the Actions API. Look for failed runs of the "Continuous Integration" workflow on the PR's head SHA.
