@@ -170,8 +170,15 @@ public class LargeJSONPayloadGenerator {
 
             // Fill chunk with base64-like data
             int dataSize = chunkSize - 200; // Account for JSON structure overhead
-            for (int j = 0; j < dataSize; j++) {
-                json.append((char) ('A' + (j % 26)));
+            // Pre-build a repeating pattern to avoid per-character appends
+            String pattern = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            int fullRepeats = dataSize / pattern.length();
+            int remainder = dataSize % pattern.length();
+            for (int j = 0; j < fullRepeats; j++) {
+                json.append(pattern);
+            }
+            if (remainder > 0) {
+                json.append(pattern, 0, remainder);
             }
 
             json.append("\",\n");
